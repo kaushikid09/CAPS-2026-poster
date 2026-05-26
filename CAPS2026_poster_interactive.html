@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scaling Citizen Science Globally — CAPS 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --indigo:      #2D2A7A;
+    --indigo-dark: #1A1850;
+    --indigo-mid:  #4A46A8;
+    --indigo-pale: #EEEEF8;
+    --indigo-xs:   #F7F7FC;
+    --green:       #6DC04A;
+    --green-dark:  #3B6D11;
+    --green-light: #EAF6E0;
+    --pink:        #D94FA0;
+    --pink-light:  #FAE8F3;
+    --teal:        #1D9E75;
+    --amber:       #BA7517;
+    --gray-dark:   #1E1C2E;
+    --gray-mid:    #6B697E;
+    --gray-light:  #F2F2F7;
+    --gray-border: #DDDDE8;
+    --white:       #ffffff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--gray-dark);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--indigo-dark);
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 0 0;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -80px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: rgba(109,192,74,0.12);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 40px; right: 10%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(217,79,160,0.1);
+  }
+  .hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2.5rem 3rem;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    border: 1px solid rgba(109,192,74,0.3);
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+  }
+  .crops-dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .crops-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+  .hero h1 em { color: var(--green); font-style: italic; }
+  .hero h1 .pk { color: var(--pink); font-style: normal; }
+  .hero-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 0.5rem;
+  }
+  .hero-authors {
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 2rem;
+  }
+  .hero-authors strong { color: rgba(255,255,255,0.8); }
+  .hero-stats {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .hero-stat {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 14px 20px;
+    border-radius: 4px;
+    text-align: center;
+    min-width: 100px;
+  }
+  .hero-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--green);
+    line-height: 1;
+    display: block;
+  }
+  .hero-stat-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+    display: block;
+    line-height: 1.4;
+  }
+  .hero-wave {
+    height: 32px;
+    overflow: hidden;
+  }
+  .hero-wave svg { display: block; width: 100%; height: 100%; }
+
+  /* ── NAV ── */
+  .nav {
+    background: var(--indigo);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav a {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    padding: 12px 16px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .nav a:hover {
+    color: var(--white);
+    border-bottom-color: var(--green);
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 3rem 0 2.5rem;
+    border-bottom: 1px solid var(--gray-border);
+  }
+  .section:last-child { border-bottom: none; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--indigo-mid);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--indigo-dark);
+    line-height: 1.25;
+    margin-bottom: 1rem;
+  }
+  .section-intro {
+    font-size: 15px;
+    color: var(--gray-mid);
+    max-width: 680px;
+    margin-bottom: 1.75rem;
+    line-height: 1.7;
+  }
+
+  /* ── TWO-COL ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 680px) {
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--gray-light);
+    border-left: 3px solid var(--indigo);
+    padding: 14px 16px;
+    border-radius: 0 4px 4px 0;
+  }
+  .card.green { border-left-color: var(--green); }
+  .card.pink  { border-left-color: var(--pink); }
+  .card.teal  { border-left-color: var(--teal); }
+  .card.amber { border-left-color: var(--amber); }
+  .card-title {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--indigo-mid);
+    margin-bottom: 5px;
+  }
+  .card.green .card-title { color: var(--green-dark); }
+  .card.pink  .card-title { color: #7D1A59; }
+  .card.teal  .card-title { color: #0F6E56; }
+  .card p { font-size: 13.5px; color: var(--gray-dark); line-height: 1.6; }
+  .card p + p { margin-top: 6px; }
+
+  /* ── MISSION CHIPS ── */
+  .missions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .mission-chip {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 3px;
+  }
+  .chip-indigo { background: var(--indigo-pale); color: var(--indigo); }
+  .chip-pink   { background: var(--pink-light);  color: #7D1A59; }
+  .chip-green  { background: var(--green-light); color: var(--green-dark); }
+  .chip-teal   { background: #E1F5EE;            color: #0F6E56; }
+  .chip-gray   { background: var(--gray-light);  color: #3A3850; }
+
+  /* ── FRAMEWORK DIMS ── */
+  .dim-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 680px) {
+    .dim-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .dim-card {
+    background: var(--indigo-pale);
+    border-top: 3px solid var(--indigo);
+    padding: 10px 12px;
+    border-radius: 0 0 4px 4px;
+  }
+  .dim-card:nth-child(2) { border-top-color: #4A46A8; }
+  .dim-card:nth-child(3) { border-top-color: var(--green); }
+  .dim-card:nth-child(4) { border-top-color: var(--pink); }
+  .dim-card:nth-child(5) { border-top-color: var(--teal); }
+  .dim-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--indigo);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .dim-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--indigo-mid);
+    line-height: 1.4;
+  }
+
+  /* ── SCORE TABLE ── */
+  .score-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 1rem;
+  }
+  .score-table th {
+    background: var(--indigo-dark);
+    color: rgba(255,255,255,0.7);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  .score-table th:first-child { border-radius: 4px 0 0 0; }
+  .score-table th:last-child  { border-radius: 0 4px 0 0; }
+  .score-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--gray-border);
+    color: var(--gray-dark);
+    vertical-align: middle;
+  }
+  .score-table tr:nth-child(even) td { background: var(--indigo-xs); }
+  .score-table td:first-child { font-weight: 500; color: var(--indigo-dark); }
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+  }
+  .badge-high   { background: var(--green-light); color: var(--green-dark); }
+  .badge-mid    { background: var(--indigo-pale); color: var(--indigo-mid); }
+  .badge-low    { background: var(--pink-light);  color: #7D1A59; }
+
+  /* ── REPO SCORECARD ── */
+  .tier-block { margin-bottom: 1.5rem; }
+  .tier-heading {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    margin-bottom: 6px;
+    border-radius: 3px;
+  }
+  .tier-green { background: var(--green-light); color: var(--green-dark); }
+  .tier-indigo { background: var(--indigo-pale); color: var(--indigo-mid); }
+  .tier-pink  { background: var(--pink-light); color: #7D1A59; }
+  .repo-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--gray-border);
+    font-size: 13px;
+  }
+  .repo-row:last-child { border-bottom: none; }
+  .repo-name { font-weight: 500; color: var(--indigo-dark); min-width: 130px; flex-shrink: 0; }
+  .repo-note { color: var(--gray-mid); font-size: 12.5px; }
+  .check { color: var(--green); font-weight: 700; margin-right: 2px; }
+  .cross { color: var(--pink);  font-weight: 700; margin-right: 2px; }
+
+  /* ── RECS ── */
+  .rec-list { list-style: none; }
+  .rec-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-border);
+    align-items: flex-start;
+  }
+  .rec-item:last-child { border-bottom: none; }
+  .rec-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--indigo-pale);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 36px;
+    text-align: right;
+  }
+  .rec-body { flex: 1; }
+  .rec-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--indigo-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .rec-body p { font-size: 13px; color: var(--gray-mid); line-height: 1.6; }
+
+  /* ── BEST PRACTICE ── */
+  .bp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 640px) { .bp-grid { grid-template-columns: 1fr; } }
+  .bp-card {
+    background: var(--indigo-xs);
+    border: 1px solid var(--gray-border);
+    padding: 14px 16px;
+    border-radius: 4px;
+  }
+  .bp-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    background: var(--indigo);
+    color: var(--white);
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .bp-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--indigo-dark);
+    margin-bottom: 5px;
+  }
+  .bp-card p { font-size: 12.5px; color: var(--gray-mid); line-height: 1.6; }
+  .bp-examples {
+    font-size: 11.5px;
+    color: var(--indigo-mid);
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--indigo-dark);
+    padding: 2rem 2.5rem;
+    margin-top: 2rem;
+  }
+  .footer-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.7;
+  }
+  .footer strong { color: var(--green); }
+  .footer a { color: rgba(255,255,255,0.5); }
+
+  /* ── CHART LEGEND ── */
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--gray-mid);
+  }
+  .legend-swatch {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  /* ── PULL QUOTE ── */
+  .pull-quote {
+    border-left: 4px solid var(--green);
+    padding: 16px 20px;
+    background: var(--green-light);
+    margin: 1.5rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-style: italic;
+    color: var(--green-dark);
+    line-height: 1.6;
+  }
+  .pull-quote cite {
+    display: block;
+    font-size: 11px;
+    color: var(--teal);
+    font-style: normal;
+    margin-top: 6px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-inner > * {
+    animation: fadeUp 0.5s ease both;
+  }
+  .hero-inner > *:nth-child(1) { animation-delay: 0.05s; }
+  .hero-inner > *:nth-child(2) { animation-delay: 0.12s; }
+  .hero-inner > *:nth-child(3) { animation-delay: 0.18s; }
+  .hero-inner > *:nth-child(4) { animation-delay: 0.24s; }
+  .hero-inner > *:nth-child(5) { animation-delay: 0.30s; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="crops-dots">
+        <span class="crops-dot" style="background:#6DC04A;"></span>
+        <span class="crops-dot" style="background:#4A46A8;"></span>
+        <span class="crops-dot" style="background:#D94FA0;"></span>
+      </span>
+      CAPS 2026 &nbsp;·&nbsp; Earthwatch Europe &nbsp;·&nbsp; CROPS Project
+    </div>
+
+    <h1>Scaling Citizen Science <em>Globally</em>:<br>Barriers, <span class="pk">Enablers</span>, and Impact</h1>
+
+    <p class="hero-sub">An analysis of open data repositories across five EU Missions</p>
+    <p class="hero-authors"><strong>Kaushiki Das &amp; Dr James Sprinks</strong> &nbsp;·&nbsp; Earthwatch Europe &nbsp;·&nbsp; Deliverable D4.1, CROPS Project (Horizon Europe GA&nbsp;101131696)</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">34</span>
+        <span class="hero-stat-label">repositories<br>identified</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">17</span>
+        <span class="hero-stat-label">met FAIR<br>inclusion criteria</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">5</span>
+        <span class="hero-stat-label">EU Missions<br>assessed</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">25</span>
+        <span class="hero-stat-label">ScienceUs pilots<br>mapped</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 900 32" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 32 Q225 0 450 16 Q675 32 900 4 L900 32 Z" fill="#ffffff"/>
+    </svg>
+  </div>
+</div>
+
+<!-- STICKY NAV -->
+<nav class="nav" aria-label="Poster sections">
+  <div class="nav-inner">
+    <a href="#context">Context</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#scores">Mission scores</a>
+    <a href="#repositories">Repository scorecard</a>
+    <a href="#findings">Key findings</a>
+    <a href="#practices">Best practices</a>
+    <a href="#recommendations">Recommendations</a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- CONTEXT -->
+  <section class="section" id="context">
+    <div class="section-label">Context &amp; motivation</div>
+    <h2 class="section-title">Why scale citizen science?</h2>
+    <p class="section-intro">Citizen science has proven its value across scientific disciplines — collecting new, complementary data that enhances existing monitoring methods. By scaling citizen science efforts to national, European or global levels, we can harness the power of multinational communities to tackle pressing global challenges. Yet most projects begin at small scale and face significant barriers when attempting to scale up.</p>
+
+    <div class="pull-quote">
+      <p>"The CROPS project examines critical factors — barriers and enablers — that determine whether scaling efforts succeed or stall, drawing on experiences from funding structures, data management systems, and cultural and societal factors."</p>
+      <cite>CAPS 2026 Abstract · Das &amp; Sprinks, Earthwatch Europe</cite>
+    </div>
+
+    <p style="font-size:13.5px; color:var(--gray-mid); margin-bottom:1.25rem;">This deliverable focuses on open data repositories across <strong style="color:var(--indigo-dark);">five EU Missions</strong>, examining how platforms support data accessibility, submission, curation and FAIR-aligned reuse:</p>
+
+    <div class="missions">
+      <span class="mission-chip chip-indigo">Adaptation to Climate Change</span>
+      <span class="mission-chip chip-pink">Cancer</span>
+      <span class="mission-chip chip-green">Restore our Oceans &amp; Waters</span>
+      <span class="mission-chip chip-teal">Climate-Neutral Smart Cities</span>
+      <span class="mission-chip chip-gray">A Soil Deal for Europe</span>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Barriers to scaling</div>
+        <p>Technical infrastructure challenges · Practical coordination issues · Conceptual gaps in project design · Insufficient funding mechanisms</p>
+      </div>
+      <div class="card green">
+        <div class="card-title">Enablers of impact</div>
+        <p>Transnational networks · Shared data standards · Open licensing · Community participation embedded by design · Policy alignment</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section class="section" id="methodology">
+    <div class="section-label">Methodology · D4.1, Section 2</div>
+    <h2 class="section-title">How we assessed open data repositories</h2>
+    <p class="section-intro">Desk-based review combining academic literature, policy documents, and outputs from CS-TRACK and COS4CLOUD. Repository identification was supported by AI-assisted scoping (ChatGPT, Elicit AI), with all suggestions manually cross-checked. Scoring used a 1–3 scale across five FAIR-aligned dimensions.</p>
+
+    <div class="dim-grid">
+      <div class="dim-card">
+        <span class="dim-num">1</span>
+        <div class="dim-name">Repository openness</div>
+      </div>
+      <div class="dim-card">
+        <span class="dim-num">2</span>
+        <div class="dim-name">Citizen data submission</div>
+      </div>
+      <div class="dim-card">
+        <span class="dim-num">3</span>
+        <div class="dim-name">Interoperability</div>
+      </div>
+      <div class="dim-card">
+        <span class="dim-num">4</span>
+        <div class="dim-name">Reuse licensing clarity</div>
+      </div>
+      <div class="dim-card">
+        <span class="dim-num">5</span>
+        <div class="dim-name">Institutional sustainability</div>
+      </div>
+    </div>
+
+    <div class="three-col">
+      <div style="text-align:center; background:var(--green-light); padding:14px; border-radius:4px;">
+        <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:var(--green-dark);">3 — High</div>
+        <div style="font-size:12px; color:var(--green-dark); margin-top:3px;">Fully FAIR-aligned</div>
+      </div>
+      <div style="text-align:center; background:var(--indigo-pale); padding:14px; border-radius:4px;">
+        <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:var(--indigo-mid);">2 — Moderate</div>
+        <div style="font-size:12px; color:var(--indigo-mid); margin-top:3px;">Structural barriers</div>
+      </div>
+      <div style="text-align:center; background:var(--pink-light); padding:14px; border-radius:4px;">
+        <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:#7D1A59;">1 — Low</div>
+        <div style="font-size:12px; color:#7D1A59; margin-top:3px;">Restricted / minimal</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION SCORES -->
+  <section class="section" id="scores">
+    <div class="section-label">Analytical framework · Figure 2, D4.1</div>
+    <h2 class="section-title">Mission scores across five dimensions</h2>
+    <p class="section-intro">Each of the five EU Missions was scored across the five dimensions. The chart below shows the comparative scores, directly from the radar analysis in D4.1 Section 7.</p>
+
+    <div class="chart-legend">
+      <span><span class="legend-swatch" style="background:#2D2A7A;"></span>Oceans &amp; waters</span>
+      <span><span class="legend-swatch" style="background:#4A46A8;"></span>Climate adaptation</span>
+      <span><span class="legend-swatch" style="background:#6DC04A;"></span>Smart cities</span>
+      <span><span class="legend-swatch" style="background:#9B8FD4;"></span>Soil deal</span>
+      <span><span class="legend-swatch" style="background:#D94FA0;"></span>Cancer</span>
+      <span style="margin-left:auto; font-style:italic; color:var(--gray-mid);">1 = Low · 2 = Moderate · 3 = High</span>
+    </div>
+
+    <div style="position:relative; width:100%; height:340px; margin-bottom:1.5rem;">
+      <canvas id="scoreChart" role="img" aria-label="Grouped bar chart showing mission scores across five dimensions. Oceans and Waters leads overall; Cancer scores lowest across most dimensions.">Mission scores: Repository openness — Oceans 3, Adaptation 3, Smart Cities 2, Soil Deal 3, Cancer 1. Citizen submission — Oceans 2, Adaptation 1, Smart Cities 3, Soil Deal 1, Cancer 1. Interoperability — Oceans 3, Adaptation 3, Smart Cities 1, Soil Deal 3, Cancer 2. Reuse licensing — Oceans 3, Adaptation 3, Smart Cities 2, Soil Deal 2, Cancer 1. Sustainability — Oceans 3, Adaptation 3, Smart Cities 1, Soil Deal 3, Cancer 2.</canvas>
+    </div>
+
+    <div class="two-col">
+      <div class="card teal">
+        <div class="card-title">Restore our Oceans &amp; Waters — Strongest overall</div>
+        <p>Consistently high across all five dimensions, particularly due to EMODnet and participatory tools like iNaturalist. Highest citizen data submission score of any mission.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Adaptation to Climate Change — Strong technically</div>
+        <p>Performs well on openness, interoperability and sustainability (Copernicus CDS, GBIF, Climate-ADAPT). However shows minimal citizen contribution — data flows almost entirely from meteorological agencies.</p>
+      </div>
+      <div class="card green">
+        <div class="card-title">Climate-Neutral Smart Cities — High participation, fragmented</div>
+        <p>Scores highest on citizen submission (Smart Citizen, OpenStreetMap) but suffers from fragmentation in interoperability and unclear reuse licensing across city-specific platforms.</p>
+      </div>
+      <div class="card amber">
+        <div class="card-title">A Soil Deal for Europe — Robust openness, limited civic participation</div>
+        <p>Strong openness and sustainability (ESDAC, ISRIC, LUCAS) but lacks citizen contribution mechanisms and clear reuse protocols. Major repositories do not enable direct public submission.</p>
+      </div>
+    </div>
+
+    <div class="card pink" style="margin-top:1rem;">
+      <div class="card-title">Cancer — Lowest overall</div>
+      <p>Ethical and legal constraints inherent in health data governance limit openness, citizen submission and licensing clarity across all repositories. PatientsLikeMe accepts citizen data but lacks transparency and institutional sustainability.</p>
+    </div>
+  </section>
+
+  <!-- REPOSITORY SCORECARD -->
+  <section class="section" id="repositories">
+    <div class="section-label">Table 11, D4.1 · Repository-level comparison</div>
+    <h2 class="section-title">Repository scorecard: who passes on all five dimensions?</h2>
+    <p class="section-intro">All 17 repositories assessed against citizen submission, openness, sustainability, interoperability and licensing clarity. Directly from Table 11 of the deliverable.</p>
+
+    <div class="tier-block">
+      <div class="tier-heading tier-green">✓ All five dimensions — the gold standard</div>
+      <div class="repo-row"><span class="repo-name">iNaturalist</span><span class="repo-note">Open citizen submission · CC-BY · GBIF-integrated · peer-validated by community</span></div>
+      <div class="repo-row"><span class="repo-name">GBIF</span><span class="repo-note">CC0 · Darwin Core metadata · open API · institutionally sustainable</span></div>
+      <div class="repo-row"><span class="repo-name">OpenStreetMap</span><span class="repo-note">Community-led · ODbL licensed · API-accessible · fully participatory</span></div>
+      <div class="repo-row"><span class="repo-name">OpenLandMap</span><span class="repo-note">Open GitHub contribution · CC BY 4.0 · GeoTIFF/NetCDF · open source methodology</span></div>
+      <div class="repo-row"><span class="repo-name">Zenodo (Urban)</span><span class="repo-note">Open submission · CC0/CC-BY · DOI assignment · EOSC-linked</span></div>
+    </div>
+
+    <div class="tier-block">
+      <div class="tier-heading tier-indigo">◑ Four of five — strong performers with one gap</div>
+      <div class="repo-row"><span class="repo-name">EMODnet</span><span class="repo-note">INSPIRE-compliant · FAIR-aligned · EU-funded — <em>no citizen submission</em></span></div>
+      <div class="repo-row"><span class="repo-name">Copernicus CDS</span><span class="repo-note">Free &amp; open policy · NetCDF/GRIB · ECMWF-backed — <em>no citizen submission</em></span></div>
+      <div class="repo-row"><span class="repo-name">Climate-ADAPT</span><span class="repo-note">CC-BY 4.0 · JRC-backed · open access — <em>no direct citizen submission</em></span></div>
+      <div class="repo-row"><span class="repo-name">PANGAEA</span><span class="repo-note">DOI assignment · open access · peer-reviewed — <em>no citizen submission</em></span></div>
+      <div class="repo-row"><span class="repo-name">OBIS · CMEMS</span><span class="repo-note">Open access · CC-BY · interoperable — <em>no clear reuse licensing</em> (CMEMS) or <em>no citizen submission</em></span></div>
+      <div class="repo-row"><span class="repo-name">Smart Citizen</span><span class="repo-note">Citizen submission · open · CC-BY — <em>not institutionally sustainable</em></span></div>
+      <div class="repo-row"><span class="repo-name">FreshWater Watch</span><span class="repo-note">Citizen submission · Earthwatch-validated — <em>no clear reuse licensing</em></span></div>
+    </div>
+
+    <div class="tier-block">
+      <div class="tier-heading tier-pink">✗ One or fewer — significant constraints</div>
+      <div class="repo-row"><span class="repo-name">PatientsLikeMe</span><span class="repo-note">Accepts citizens — but not open, not sustainable, no clear licensing</span></div>
+      <div class="repo-row"><span class="repo-name">Marine Data Archive</span><span class="repo-note">Restricted access limits independent reuse; not open</span></div>
+      <div class="repo-row"><span class="repo-name">SeaDataNet</span><span class="repo-note">Rich institutional data — controlled access, no citizen submission, no clear licensing</span></div>
+      <div class="repo-row"><span class="repo-name">KM4City</span><span class="repo-note">Not sustainable, not interoperable, no clear licensing</span></div>
+      <div class="repo-row"><span class="repo-name">ESDAC · ISRIC · LUCAS</span><span class="repo-note">Open and sustainable — but no citizen submission and unclear reuse terms</span></div>
+    </div>
+  </section>
+
+  <!-- KEY FINDINGS -->
+  <section class="section" id="findings">
+    <div class="section-label">Results · D4.1, Section 7</div>
+    <h2 class="section-title">Key findings: strengths and critical gaps</h2>
+    <p class="section-intro">From the comparative analysis of 17 repositories across 5 EU Missions, drawing on the five analytical dimensions and FAIR principles.</p>
+
+    <div class="two-col">
+      <div>
+        <h3 style="font-size:13px; font-weight:600; color:var(--green-dark); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">What works well</h3>
+        <div class="card green" style="margin-bottom:8px;">
+          <div class="card-title">Technical quality</div>
+          <p>EMODnet, Copernicus CDS and ESDAC show strong FAIR alignment, INSPIRE-compliant metadata, and sustained EU institutional backing. These represent the baseline for mission-critical infrastructure.</p>
+        </div>
+        <div class="card green" style="margin-bottom:8px;">
+          <div class="card-title">Participatory design</div>
+          <p>iNaturalist and OpenStreetMap demonstrate what best practice looks like when citizen contribution is embedded by design — open licensing, peer validation, and machine-readable APIs from the outset.</p>
+        </div>
+        <div class="card green">
+          <div class="card-title">Licensing openness</div>
+          <p>Oceans, Adaptation and Smart Cities missions predominantly use CC0 / CC-BY licences, enabling broad secondary reuse without legal barriers for researchers, policymakers and businesses.</p>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:13px; font-weight:600; color:#7D1A59; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Critical gaps</h3>
+        <div class="card pink" style="margin-bottom:8px;">
+          <div class="card-title">No citizen submission pathway</div>
+          <p>Most institutional repositories have no clear public submission pathway. Climate adaptation data flows almost entirely from meteorological agencies — excluding valuable community knowledge.</p>
+        </div>
+        <div class="card pink" style="margin-bottom:8px;">
+          <div class="card-title">Licensing inconsistency</div>
+          <p>Soil and Cancer repositories lack harmonised reuse terms. Inconsistent or ambiguous licensing blocks secondary use and cross-mission data integration.</p>
+        </div>
+        <div class="card pink" style="margin-bottom:8px;">
+          <div class="card-title">Sustainability risk</div>
+          <p>Many citizen science platforms depend on time-bound EU project funding with no continuity plan. When grants end, data and communities can disappear.</p>
+        </div>
+        <div class="card pink">
+          <div class="card-title">Governance opacity</div>
+          <p>Few repositories publish clear governance frameworks or ethical guidelines. Transparency about who controls data, how it is licensed and how contributors are credited directly drives volunteer trust.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote" style="margin-top:1.5rem;">
+      <p>"Most platforms lack clear citizen submission channels, consistent reuse terms, or visible governance frameworks. Participatory platforms such as iNaturalist and OpenStreetMap highlight best practices but are not yet mainstreamed across Missions."</p>
+      <cite>D4.1, Executive Summary — Das &amp; Sprinks (2025)</cite>
+    </div>
+  </section>
+
+  <!-- BEST PRACTICES -->
+  <section class="section" id="practices">
+    <div class="section-label">Section 8, D4.1 · Best practices</div>
+    <h2 class="section-title">Best practices for open data repositories</h2>
+    <p class="section-intro">Six evidence-based practices identified from repositories that most effectively support inclusive participation, sustainable data use and mission-relevant research. Drawn directly from D4.1 Section 8.</p>
+
+    <div class="bp-grid">
+      <div class="bp-card">
+        <div class="bp-letter">a</div>
+        <div class="bp-title">Recognised metadata standards</div>
+        <p>Adopt domain-relevant schemas — Darwin Core (biodiversity), ISO 19115 (geospatial), INSPIRE (EU spatial data). Enables cross-platform discovery and long-term curation.</p>
+        <div class="bp-examples">Examples: EMODnet, OBIS, ESDAC</div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-letter" style="background:var(--teal);">b</div>
+        <div class="bp-title">Machine-readable formats and APIs</div>
+        <p>CSV, JSON, NetCDF, GeoTIFF plus public APIs for real-time integration into dashboards and climate models. Enables automation, visualisation and third-party innovation.</p>
+        <div class="bp-examples">Examples: OpenStreetMap, Smart Citizen, Copernicus CDS, OpenLandMap</div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-letter" style="background:var(--green);">c</div>
+        <div class="bp-title">Clear and inclusive reuse licensing</div>
+        <p>CC0, CC-BY or ODbL licences that are prominently displayed and enforced. Reduces legal uncertainty and supports cross-sectoral uptake in research, policy and public engagement.</p>
+        <div class="bp-examples">Examples: Zenodo, GBIF, OpenStreetMap</div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-letter" style="background:var(--indigo-mid);">d</div>
+        <div class="bp-title">Ethical governance and participatory models</div>
+        <p>Transparency about data management decisions and contributor rights. Community moderation and peer-validation empower contributors while ensuring data integrity.</p>
+        <div class="bp-examples">Examples: iNaturalist, OpenStreetMap, Cancer Imaging Archive (for sensitive data)</div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-letter" style="background:var(--amber);">e</div>
+        <div class="bp-title">Equity and accessibility in design</div>
+        <p>User-friendly interfaces, multilingual support, and clear pathways for non-expert contributors. Open submission must be balanced with quality safeguards and validation protocols.</p>
+        <div class="bp-examples">Examples: Smart Citizen, EMODnet Biology</div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-letter" style="background:var(--pink);">f</div>
+        <div class="bp-title">Alignment with policy frameworks</div>
+        <p>Repository outputs linked explicitly to EU monitoring instruments — CAP (Soil), Marine Strategy Directive (Oceans), EU Green Deal (Cities/Adaptation), Beating Cancer Plan (Cancer).</p>
+        <div class="bp-examples">Examples: EMODnet → marine policy compliance, ESDAC → CAP monitoring</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECOMMENDATIONS -->
+  <section class="section" id="recommendations">
+    <div class="section-label">Section 10, D4.1 · Recommendations</div>
+    <h2 class="section-title">Recommendations for open data ecosystems</h2>
+    <p class="section-intro">Practical roadmap for improving the inclusivity, reliability and long-term impact of open data repositories aligned with EU Mission objectives. From D4.1 Section 10.</p>
+
+    <ol class="rec-list">
+      <li class="rec-item">
+        <span class="rec-num">1</span>
+        <div class="rec-body">
+          <div class="rec-title">Strengthen cross-mission interoperability</div>
+          <p>Adopt common metadata standards (ISO 19115, INSPIRE, Darwin Core) and develop crosswalks to enable data exchange between repositories serving different Missions — horizontal integration across biodiversity, climate and urban domains.</p>
+        </div>
+      </li>
+      <li class="rec-item">
+        <span class="rec-num">2</span>
+        <div class="rec-body">
+          <div class="rec-title">Mandate open licensing and machine-readable formats</div>
+          <p>Require all EU-funded repositories to publish under open licences (CC-BY or CC0) in accessible formats (CSV, JSON, NetCDF) with documented APIs. Promotes reuse, automation and integration across scientific and civic data ecosystems.</p>
+        </div>
+      </li>
+      <li class="rec-item">
+        <span class="rec-num">3</span>
+        <div class="rec-body">
+          <div class="rec-title">Expand citizen participation pathways</div>
+          <p>Develop structured submission channels with quality control protocols and contributor guidance. Participation should be inclusive but not at the expense of data integrity or interoperability.</p>
+        </div>
+      </li>
+      <li class="rec-item">
+        <span class="rec-num">4</span>
+        <div class="rec-body">
+          <div class="rec-title">Improve governance transparency</div>
+          <p>Ensure repositories publish clear governance frameworks, ethical guidelines and user support mechanisms for feedback, dispute resolution and attribution. Particularly vital for repositories handling sensitive or community-generated data.</p>
+        </div>
+      </li>
+      <li class="rec-item">
+        <span class="rec-num">5</span>
+        <div class="rec-body">
+          <div class="rec-title">Align with policy instruments and monitoring systems</div>
+          <p>Design repository outputs with explicit links to EU frameworks — CAP (Soil Deal), Marine Strategy Directive (Oceans), EU Green Deal (Smart Cities/Adaptation), Europe's Beating Cancer Plan (Cancer Mission). Open data must directly inform regulatory action.</p>
+        </div>
+      </li>
+      <li class="rec-item">
+        <span class="rec-num">6</span>
+        <div class="rec-body">
+          <div class="rec-title">Support long-term sustainability beyond project lifecycles</div>
+          <p>Embed data stewardship plans from project outset. Explore institutional, federated or mission-driven hosting models to ensure repositories remain active and reliable beyond EU funding cycles. Essential to prevent data loss and enable cumulative science.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <p><strong>CROPS Project</strong> — Curating, Replicating, Orchestrating &amp; Propagating Citizen Science across Europe</p>
+      <p>Horizon Europe · Grant Agreement No. 101131696 · January 2024–December 2026</p>
+      <p style="margin-top:6px;">Das, K., Sprinks, J. (2025). D4.1: An analysis of open data repositories. Earthwatch Europe / CROPS Project.</p>
+    </div>
+    <div style="text-align:right;">
+      <p><a href="https://crops-cs.eu">crops-cs.eu</a></p>
+      <p>CAPS 2026</p>
+      <p style="margin-top:6px; font-size:11px;">KEYWORDS: #CitizenScience #OpenData #FAIR #EUMissions #DataRepositories #Scaling</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+const ctx = document.getElementById('scoreChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['Repository\nopenness', 'Citizen\nsubmission', 'Interoper-\nability', 'Reuse\nlicensing', 'Institutional\nsustainability'],
+    datasets: [
+      { label: 'Oceans & waters',    data: [3,2,3,3,3], backgroundColor: '#2D2A7A', borderRadius: 2 },
+      { label: 'Climate adaptation', data: [3,1,3,3,3], backgroundColor: '#4A46A8', borderRadius: 2 },
+      { label: 'Smart cities',       data: [2,3,1,2,1], backgroundColor: '#6DC04A', borderRadius: 2 },
+      { label: 'Soil deal',          data: [3,1,3,2,3], backgroundColor: '#9B8FD4', borderRadius: 2 },
+      { label: 'Cancer',             data: [1,1,2,1,2], backgroundColor: '#D94FA0', borderRadius: 2 },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const v = ctx.parsed.y;
+            const label = v === 3 ? 'High' : v === 2 ? 'Moderate' : 'Low';
+            return ` ${ctx.dataset.label}: ${v} (${label})`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 11, family: "'DM Sans', sans-serif" }, color: '#6B697E' }
+      },
+      y: {
+        min: 0, max: 3,
+        ticks: {
+          stepSize: 1,
+          font: { size: 11 },
+          color: '#6B697E',
+          callback: v => v === 0 ? '' : v === 1 ? 'Low' : v === 2 ? 'Mod.' : 'High'
+        },
+        grid: { color: 'rgba(0,0,0,0.05)' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
